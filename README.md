@@ -1,10 +1,22 @@
-# HairSwift-back
+# HairSwift-back 💈
 
 Backend API pour l'application de gestion de rendez-vous de coiffure HairSwift.
 
-## Description
+## Présentation
 
-HairSwift-back est une API REST développée en Go qui gère les fonctionnalités principales d'un système de réservation de rendez-vous de coiffure. L'API permet de gérer les clients, les salons, les coiffeurs, les créneaux horaires et les réservations.
+HairSwift est un projet scolaire conçu pour explorer les capacités de Go (Golang) en développement backend, tout en encourageant les développeurs frontend à se plonger dans les technologies backend.
+L'application vise à gérer efficacement un salon de coiffure.
+
+## Stack 🖥️
+
+### Développement Back-end avec Go 🛠
+
+Le backend de notre application est développé en utilisant Go, garantissant une robustesse et une efficacité optimales dans le traitement des requêtes serveur.
+Go, grâce à sa syntaxe concise et ses performances élevées, s'impose comme le choix idéal pour assurer la fiabilité de notre infrastructure côté serveur.
+
+### Base de données avec Supabase 🗄️
+
+Nous utilisons Supabase comme solution de base de données, offrant une infrastructure PostgreSQL robuste avec des fonctionnalités modernes comme l'authentification, les API RESTful et le stockage en temps réel.
 
 ## Fonctionnalités
 
@@ -17,7 +29,7 @@ HairSwift-back est une API REST développée en Go qui gère les fonctionnalité
 ## Prérequis
 
 - Go 1.x
-- MySQL
+- Compte Supabase
 - Git
 
 ## Installation
@@ -25,7 +37,7 @@ HairSwift-back est une API REST développée en Go qui gère les fonctionnalité
 1. Clonez le dépôt :
 
 ```bash
-git clone [URL_DU_REPO]
+git clone https://github.com/N95Ryan/hairswift-back.git
 ```
 
 2. Installez les dépendances :
@@ -34,10 +46,11 @@ git clone [URL_DU_REPO]
 go mod download
 ```
 
-3. Configurez la base de données MySQL :
+3. Configurez Supabase :
 
-- Créez une base de données MySQL
-- Modifiez les paramètres de connexion dans le code source
+- Créez un projet sur Supabase
+- Configurez les variables d'environnement avec vos identifiants Supabase
+- Importez le schéma de base de données fourni
 
 4. Lancez l'application :
 
@@ -98,6 +111,8 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 4. Pousser vers la branche
 5. Ouvrir une Pull Request
 
-## Licence
+## 👥 Auteurs
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+- [Ryan PINA-SILASSE](https://github.com/N95Ryan)
+- [Nathan PINARD](https://github.com/YOUGBOY95)
+- [Anne-Catherine MICHAUD](https://github.com/annemhd)
