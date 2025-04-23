@@ -1,4 +1,4 @@
-# HairSwift-back 💈
+# Présentation de HairSwift 💈
 
 Backend API pour l'application de gestion de rendez-vous de coiffure HairSwift.
 
