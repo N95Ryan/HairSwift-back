@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"hairswift-back/controllers"
 	"hairswift-back/database"
-	"hairswift-back/handlers"
 )
 
 func main() {
@@ -16,38 +16,42 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Initialisation des handlers avec le client Supabase
-	handlers.InitHandlers(client)
+	// Initialisation des controllers
+	clientController := controllers.NewClientController(client)
+	salonController := controllers.NewSalonController(client)
+	coiffeurController := controllers.NewCoiffeurController(client)
+	creneauController := controllers.NewCreneauController(client)
+	reservationController := controllers.NewReservationController(client)
 
 	// Routes pour les clients
-	http.HandleFunc("/api/clients", handlers.GetClientsHandler)
-	http.HandleFunc("/api/clients/add", handlers.AddClientHandler)
-	http.HandleFunc("/api/clients/update", handlers.UpdateClientHandler)
-	http.HandleFunc("/api/clients/delete", handlers.DeleteClientHandler)
+	http.HandleFunc("/api/clients", clientController.GetClients)
+	http.HandleFunc("/api/clients/add", clientController.AddClient)
+	http.HandleFunc("/api/clients/update", clientController.UpdateClient)
+	http.HandleFunc("/api/clients/delete", clientController.DeleteClient)
 
 	// Routes pour les salons
-	http.HandleFunc("/api/salons", handlers.GetSalonsHandler)
-	http.HandleFunc("/api/salons/add", handlers.AddSalonHandler)
-	http.HandleFunc("/api/salons/update", handlers.UpdateSalonHandler)
-	http.HandleFunc("/api/salons/delete", handlers.DeleteSalonHandler)
+	http.HandleFunc("/api/salons", salonController.GetSalons)
+	http.HandleFunc("/api/salons/add", salonController.AddSalon)
+	http.HandleFunc("/api/salons/update", salonController.UpdateSalon)
+	http.HandleFunc("/api/salons/delete", salonController.DeleteSalon)
 
 	// Routes pour les coiffeurs
-	http.HandleFunc("/api/coiffeurs", handlers.GetCoiffeursHandler)
-	http.HandleFunc("/api/coiffeur/add", handlers.AddCoiffeurHandler)
-	http.HandleFunc("/api/coiffeur/update", handlers.UpdateCoiffeurHandler)
-	http.HandleFunc("/api/coiffeur/delete", handlers.DeleteCoiffeurHandler)
+	http.HandleFunc("/api/coiffeurs", coiffeurController.GetCoiffeurs)
+	http.HandleFunc("/api/coiffeurs/add", coiffeurController.AddCoiffeur)
+	http.HandleFunc("/api/coiffeurs/update", coiffeurController.UpdateCoiffeur)
+	http.HandleFunc("/api/coiffeurs/delete", coiffeurController.DeleteCoiffeur)
 
 	// Routes pour les créneaux
-	http.HandleFunc("/api/creneaux", handlers.GetCreneauxHandler)
-	http.HandleFunc("/api/creneaux/add", handlers.AddCreneauHandler)
-	http.HandleFunc("/api/creneaux/update", handlers.UpdateCreneauHandler)
-	http.HandleFunc("/api/creneaux/delete", handlers.DeleteCreneauHandler)
+	http.HandleFunc("/api/creneaux", creneauController.GetCreneaux)
+	http.HandleFunc("/api/creneaux/add", creneauController.AddCreneau)
+	http.HandleFunc("/api/creneaux/update", creneauController.UpdateCreneau)
+	http.HandleFunc("/api/creneaux/delete", creneauController.DeleteCreneau)
 
 	// Routes pour les réservations
-	http.HandleFunc("/api/reservations", handlers.GetReservationsHandler)
-	http.HandleFunc("/api/reservations/add", handlers.AddReservationHandler)
-	http.HandleFunc("/api/reservations/update", handlers.UpdateReservationHandler)
-	http.HandleFunc("/api/reservations/delete", handlers.DeleteReservationHandler)
+	http.HandleFunc("/api/reservations", reservationController.GetReservations)
+	http.HandleFunc("/api/reservations/add", reservationController.AddReservation)
+	http.HandleFunc("/api/reservations/update", reservationController.UpdateReservation)
+	http.HandleFunc("/api/reservations/delete", reservationController.DeleteReservation)
 
 	port := 8080
 	fmt.Printf("Server is running on port %d...\n", port)

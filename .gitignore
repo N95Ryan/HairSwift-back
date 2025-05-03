@@ -1,0 +1,50 @@
+# Fichiers d'environnement
+.env
+.env.local
+.env.*.local
+
+# Fichiers de dépendances
+/vendor/
+
+# Fichiers binaires
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Fichiers de compilation
+*.o
+*.a
+
+# Fichiers de cache
+*.cache
+*.tmp
+*.temp
+
+# Fichiers de logs
+*.log
+
+# Fichiers de l'IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de build
+/bin/
+/build/
+
+# Fichiers de couverture de test
+*.cover
+*.prof
+
+# Fichiers de documentation générés
+/doc/
+/docs/ 
