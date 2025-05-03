@@ -1,14 +1,16 @@
 package database
 
 import (
-	"database/sql"
+	"fmt"
+	"os"
 	"sync"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
+	supa "github.com/supabase-community/supabase-go"
 )
 
 var (
-	db             *sql.DB
+	supabaseClient *supa.Client
 	clientsMu      sync.RWMutex
 	salonsMu       sync.RWMutex
 	coiffeursMu    sync.RWMutex
@@ -16,82 +18,37 @@ var (
 	reservationsMu sync.RWMutex
 )
 
-func InitDB() (*sql.DB, error) {
-	var err error
-	db, err = sql.Open("mysql", "goteam:root@tcp(localhost:3306)/golang")
-	if err != nil {
-		return nil, err
+func InitDB() (*supa.Client, error) {
+	// Charger les variables d'environnement depuis le fichier .env
+	// Ignorer l'erreur si le fichier n'existe pas (pour les tests)
+	_ = godotenv.Load()
+
+	// Récupérer les informations de Supabase
+	supabaseURL := os.Getenv("SUPABASE_URL")
+	supabaseKey := os.Getenv("SUPABASE_KEY")
+
+	if supabaseURL == "" || supabaseKey == "" {
+		return nil, fmt.Errorf("SUPABASE_URL or SUPABASE_KEY is not set")
 	}
 
-	err = db.Ping()
+	// Créer le client Supabase
+	client, err := supa.NewClient(supabaseURL, supabaseKey, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error initializing Supabase client: %v", err)
 	}
 
-	return db, nil
+	supabaseClient = client
+	return client, nil
 }
 
 func CreateTables() error {
-	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS clients (
-			id_client INT AUTO_INCREMENT PRIMARY KEY,
-			firstname VARCHAR(150),
-			lastname VARCHAR(150),
-			email VARCHAR(150),
-			password VARCHAR(255)
-		);
-	`)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS salons (
-			id_salon INT AUTO_INCREMENT PRIMARY KEY,
-			name VARCHAR(150)
-		);
-	`)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS coiffeurs (
-			id_coiffeur INT AUTO_INCREMENT PRIMARY KEY,
-			id_salon INT,
-			firstname VARCHAR(150),
-			lastname VARCHAR(150)
-		);
-	`)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS creneaux (
-			id_creneau INT AUTO_INCREMENT PRIMARY KEY,
-			id_coiffeur INT,
-			date_creneau VARCHAR(150),
-			availability BOOLEAN
-		);
-	`)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS reservations (
-			id_reservation INT AUTO_INCREMENT PRIMARY KEY,
-			id_salon INT,
-			id_coiffeur INT,
-			id_creneau INT
-		);
-	`)
-	return err
+	// Les tables sont gérées directement dans l'interface Supabase
+	// Cette fonction reste pour la compatibilité mais n'a plus besoin de créer les tables
+	return nil
 }
 
-func GetDB() *sql.DB {
-	return db
+func GetDB() *supa.Client {
+	return supabaseClient
 }
 
 func GetMutexes() (*sync.RWMutex, *sync.RWMutex, *sync.RWMutex, *sync.RWMutex, *sync.RWMutex) {

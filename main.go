@@ -10,18 +10,14 @@ import (
 )
 
 func main() {
-	// Initialisation de la base de données
-	db, err := database.InitDB()
+	// Initialisation du client Supabase
+	client, err := database.InitDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
 
-	// Création des tables
-	err = database.CreateTables()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Initialisation des handlers avec le client Supabase
+	handlers.InitHandlers(client)
 
 	// Routes pour les clients
 	http.HandleFunc("/api/clients", handlers.GetClientsHandler)
