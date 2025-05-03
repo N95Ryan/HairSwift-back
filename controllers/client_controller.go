@@ -7,16 +7,19 @@ import (
 	"strconv"
 
 	"hairswift-back/models"
+	"hairswift-back/services"
 
 	supa "github.com/supabase-community/supabase-go"
 )
 
 type ClientController struct {
-	client *supa.Client
+	clientService *services.ClientService
 }
 
 func NewClientController(client *supa.Client) *ClientController {
-	return &ClientController{client: client}
+	return &ClientController{
+		clientService: services.NewClientService(client),
+	}
 }
 
 func (c *ClientController) AddClient(w http.ResponseWriter, r *http.Request) {
@@ -28,62 +31,36 @@ func (c *ClientController) AddClient(w http.ResponseWriter, r *http.Request) {
 	var newClient models.Client
 	err := json.NewDecoder(r.Body).Decode(&newClient)
 	if err != nil {
+		log.Printf("Erreur lors du décodage du JSON: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Format JSON invalide"})
 		return
 	}
 
-	data, err := json.Marshal(newClient)
+	insertedClient, err := c.clientService.CreateClient(newClient)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Erreur lors de la création du client: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erreur lors de la création du client"})
 		return
 	}
 
-	var dataMap map[string]interface{}
-	err = json.Unmarshal(data, &dataMap)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	result, _, err := c.client.From("clients").Insert(dataMap, false, "", "", "").Execute()
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var insertedClient models.Client
-	err = json.Unmarshal(result, &insertedClient)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(insertedClient)
 }
 
 func (c *ClientController) GetClients(w http.ResponseWriter, r *http.Request) {
-	result, _, err := c.client.From("clients").Select("*", "", false).Execute()
+	clients, err := c.clientService.GetAllClients()
 	if err != nil {
-		log.Println(err)
+		log.Printf("Erreur lors de la récupération des clients: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var clientList []models.Client
-	err = json.Unmarshal(result, &clientList)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erreur lors de la récupération des clients"})
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(clientList)
+	json.NewEncoder(w).Encode(clients)
 }
 
 func (c *ClientController) UpdateClient(w http.ResponseWriter, r *http.Request) {
@@ -95,40 +72,21 @@ func (c *ClientController) UpdateClient(w http.ResponseWriter, r *http.Request) 
 	var updatedClient models.Client
 	err := json.NewDecoder(r.Body).Decode(&updatedClient)
 	if err != nil {
+		log.Printf("Erreur lors du décodage du JSON: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Format JSON invalide"})
 		return
 	}
 
-	data, err := json.Marshal(updatedClient)
+	updated, err := c.clientService.UpdateClient(updatedClient)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Erreur lors de la mise à jour du client: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erreur lors de la mise à jour du client"})
 		return
 	}
 
-	var dataMap map[string]interface{}
-	err = json.Unmarshal(data, &dataMap)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	result, _, err := c.client.From("clients").Update(dataMap, "", "").Eq("id_client", strconv.Itoa(updatedClient.ID_client)).Execute()
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var updated models.Client
-	err = json.Unmarshal(result, &updated)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updated)
 }
@@ -142,16 +100,20 @@ func (c *ClientController) DeleteClient(w http.ResponseWriter, r *http.Request) 
 	idParam := r.URL.Query().Get("id_client")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
+		log.Printf("ID invalide: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "ID invalide"})
 		return
 	}
 
-	_, _, err = c.client.From("clients").Delete("", "").Eq("id_client", strconv.Itoa(id)).Execute()
+	err = c.clientService.DeleteClient(id)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Erreur lors de la suppression du client: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erreur lors de la suppression du client"})
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Client supprimé avec succès"})
 }
